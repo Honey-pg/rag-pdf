@@ -1,0 +1,7 @@
+[project]
+name = "server"
+version = "0.1.0"
+description = "Multimodal RAG Server with Qdrant, BM25, and Gemini"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []

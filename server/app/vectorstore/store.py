@@ -1,0 +1,113 @@
+import time
+from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct,
+    PayloadSchemaType
+)
+
+from app.vectorstore.qdrant_client import client
+
+COLLECTION_NAME = "pdf_rag"
+
+
+def create_collection(vector_size: int):
+    """
+    Ensure the Qdrant collection exists with proper dimensions and indices.
+    If the collection exists with a configuration mismatch, it recreates it.
+    """
+    try:
+        collections = client.get_collections().collections
+    except Exception as e:
+        print(f"[store] Error retrieving Qdrant collections: {e}")
+        collections = []
+
+    exists = any(c.name == COLLECTION_NAME for c in collections)
+
+    if exists:
+        try:
+            info = client.get_collection(COLLECTION_NAME)
+            vectors_config = info.config.params.vectors
+
+            current_distance = None
+            current_size = None
+
+            if hasattr(vectors_config, "distance"):
+                current_distance = vectors_config.distance
+                current_size = vectors_config.size
+            elif isinstance(vectors_config, dict) and "distance" in vectors_config:
+                current_distance = vectors_config["distance"]
+                current_size = vectors_config["size"]
+
+            if current_distance == Distance.DOT and current_size == vector_size:
+                try:
+                    client.create_payload_index(COLLECTION_NAME, "user_id", PayloadSchemaType.KEYWORD)
+                except Exception:
+                    pass
+                try:
+                    client.create_payload_index(COLLECTION_NAME, "source_file", PayloadSchemaType.KEYWORD)
+                except Exception:
+                    pass
+                return
+
+            print(f"[store] Collection '{COLLECTION_NAME}' config mismatch (distance={current_distance}, size={current_size}). Recreating...")
+            client.delete_collection(COLLECTION_NAME)
+        except Exception as e:
+            print(f"[store] Error checking collection config: {e}. Forcing recreate...")
+            try:
+                client.delete_collection(COLLECTION_NAME)
+            except Exception:
+                pass
+
+    client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(
+            size=vector_size,
+            distance=Distance.DOT
+        )
+    )
+
+    try:
+        client.create_payload_index(COLLECTION_NAME, "user_id", PayloadSchemaType.KEYWORD)
+    except Exception as e:
+        print(f"[store] Error creating user_id payload index: {e}")
+
+    try:
+        client.create_payload_index(COLLECTION_NAME, "source_file", PayloadSchemaType.KEYWORD)
+    except Exception as e:
+        print(f"[store] Error creating source_file payload index: {e}")
+
+    print(f"[store] Qdrant collection '{COLLECTION_NAME}' created with Distance.DOT (dim={vector_size})")
+
+
+def store_chunks(chunks, embeddings, user_id="default_tenant", retries=3, delay=2.0):
+    """
+    Store chunk payloads and embeddings in Qdrant with exponential backoff retries.
+    """
+    points = []
+
+    for chunk, embedding in zip(chunks, embeddings):
+        payload = dict(chunk)
+        payload["user_id"] = user_id
+
+        point = PointStruct(
+            id=chunk["id"],
+            vector=embedding,
+            payload=payload
+        )
+        points.append(point)
+
+    for attempt in range(retries):
+        try:
+            client.upsert(
+                collection_name=COLLECTION_NAME,
+                points=points
+            )
+            print(f"[store] Stored {len(points)} chunks with user_id: {user_id}")
+            return
+        except Exception as e:
+            if attempt == retries - 1:
+                raise e
+            print(f"[store] Qdrant upsert attempt {attempt + 1} failed: {e}. Retrying in {delay}s...")
+            time.sleep(delay)
+            delay *= 2
