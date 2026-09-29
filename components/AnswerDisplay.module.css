@@ -1,0 +1,20 @@
+/* AnswerDisplay styling */
+.container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(8px);
+  color: #e0e0ff;
+}
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #00bcd4;
+}
+.text {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
