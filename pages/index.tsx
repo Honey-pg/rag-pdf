@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import Header from '../components/Header';
 import QuestionForm from '../components/QuestionForm';
 import AnswerDisplay from '../components/AnswerDisplay';
 import Footer from '../components/Footer';
@@ -31,6 +32,8 @@ export default function Home() {
         <meta name="description" content="Interactive Retrieval Augmented Generation with PDFs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <Header />
 
       <main className={styles.main}>
         <h1 className={styles.title}>RAG PDF</h1>
