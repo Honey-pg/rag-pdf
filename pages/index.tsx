@@ -6,6 +6,8 @@ import Footer from '../components/Footer';
 import { askQuestion } from '../utils/api';
 import { useState } from 'react';
 
+import LoadingSpinner from '../components/LoadingSpinner';
+
 export default function Home() {
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ export default function Home() {
         <h1 className={styles.title}>RAG PDF</h1>
         <p className={styles.description}>Ask questions about your PDFs using Gemini-powered LLM.</p>
         <QuestionForm onSubmit={handleSubmit} />
-        {loading && <p>Loading...</p>}
+        {loading && <LoadingSpinner />}
         {answer && <AnswerDisplay answer={answer} />}
       </main>
       <Footer />
