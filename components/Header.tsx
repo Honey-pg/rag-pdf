@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../styles/Header.module.css';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   return (
@@ -8,6 +9,7 @@ export default function Header() {
       <nav className={styles.nav}>
         <a href="/">Home</a>
         <a href="/about">About</a>
+        <ThemeToggle />
       </nav>
     </header>
   );
