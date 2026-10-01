@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../styles/ChatInterface.module.css';
 import LoadingSpinner from './LoadingSpinner';
+import MarkdownRenderer from './MarkdownRenderer';
 
 export default function ChatInterface({ onSend }: { onSend: (msg: string) => Promise<string> }) {
   const [messages, setMessages] = useState<{role: 'user'|'assistant', content: string}[]>([]);
@@ -28,7 +29,7 @@ export default function ChatInterface({ onSend }: { onSend: (msg: string) => Pro
       <div className={styles.messages}>
         {messages.map((m, i) => (
           <div key={i} className={m.role === 'user' ? styles.userMsg : styles.assistantMsg}>
-            {m.content}
+            {m.role === 'user' ? m.content : <MarkdownRenderer content={m.content} />}
           </div>
         ))}
         {loading && <div className={styles.loadingContainer}><LoadingSpinner /></div>}
