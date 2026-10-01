@@ -16,9 +16,30 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.description {
-  margin-top: 1rem;
-  font-size: 1.2rem;
-  text-align: center;
-  max-width: 600px;
+.mainContent {
+  margin-top: 80px; /* offset for header */
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rightColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatTitle {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #00bcd4;
 }

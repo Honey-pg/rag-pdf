@@ -1,28 +1,25 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import Header from '../components/Header';
-import QuestionForm from '../components/QuestionForm';
-import AnswerDisplay from '../components/AnswerDisplay';
 import Footer from '../components/Footer';
-import { askQuestion } from '../utils/api';
+import PdfUploader from '../components/PdfUploader';
+import PdfViewerPanel from '../components/PdfViewerPanel';
+import ChatInterface from '../components/ChatInterface';
 import { useState } from 'react';
 
-import LoadingSpinner from '../components/LoadingSpinner';
-
 export default function Home() {
-  const [answer, setAnswer] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const handleSubmit = async (question: string) => {
-    setLoading(true);
-    try {
-      const res = await askQuestion(question);
-      setAnswer(res);
-    } catch (e) {
-      setAnswer('Error: ' + (e as Error).message);
-    } finally {
-      setLoading(false);
-    }
+  const handleUpload = (file: File) => {
+    setPdfFile(file);
+    setPdfUrl(URL.createObjectURL(file));
+  };
+
+  const handleSendMsg = async (msg: string) => {
+    // Placeholder response simulation
+    await new Promise(r => setTimeout(r, 1000));
+    return `This is a simulated response to "${msg}" using the uploaded PDF.`;
   };
 
   return (
@@ -35,12 +32,15 @@ export default function Home() {
 
       <Header />
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>RAG PDF</h1>
-        <p className={styles.description}>Ask questions about your PDFs using Gemini-powered LLM.</p>
-        <QuestionForm onSubmit={handleSubmit} />
-        {loading && <LoadingSpinner />}
-        {answer && <AnswerDisplay answer={answer} />}
+      <main className={styles.mainContent}>
+        <div className={styles.leftColumn}>
+          <PdfUploader onUpload={handleUpload} />
+          <PdfViewerPanel fileUrl={pdfUrl} />
+        </div>
+        <div className={styles.rightColumn}>
+          <h2 className={styles.chatTitle}>Ask about the document</h2>
+          <ChatInterface onSend={handleSendMsg} />
+        </div>
       </main>
       <Footer />
     </div>
