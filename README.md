@@ -29,8 +29,27 @@ A premium, full-stack Retrieval-Augmented Generation (RAG) application that allo
    npm run dev
    ```
 
+## UI Component Catalog
+
+- **`Tooltip`**: Hover tooltips with directional positioning.
+- **`Accordion`**: Collapsible content sections for FAQs.
+- **`Tabs`**: Tabbed navigation panels.
+- **`Dropdown`**: Custom glassmorphic select dropdown.
+- **`SearchInput`**: Search bar with clear button.
+- **`Badge`**: Status badge indicators.
+- **`Card`**: Reusable container cards.
+- **`Modal`**: Slide-up backdrop blur modal.
+- **`Toast`**: Global toast notifications.
+- **`Sidebar`**: Sliding side drawer panel.
+
+## API Endpoints
+
+- `POST /api/upload`: PDF document upload & ingestion.
+- `POST /api/query`: Vector context retrieval & Q&A.
+- `GET /api/health`: Frontend system status monitoring.
+
 ## Architecture
-- **Frontend**: Next.js, React, Vanilla CSS modules
+- **Frontend**: Next.js (Pages Router), React, CSS Modules
 - **Backend**: Python, FastAPI, Gemini API, PyMuPDF
 
 ## License
