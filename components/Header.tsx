@@ -7,7 +7,9 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.logo}>RAG PDF</div>
       <nav className={styles.nav}>
-        <a href="/">Home</a>
+        <a href="/">App</a>
+        <a href="/landing">Features</a>
+        <a href="/faq">FAQ</a>
         <a href="/about">About</a>
         <ThemeToggle />
       </nav>
