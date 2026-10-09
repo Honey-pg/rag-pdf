@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styles from '../styles/ChatInterface.module.css';
 import LoadingSpinner from './LoadingSpinner';
 import MarkdownRenderer from './MarkdownRenderer';
+import VoiceInput from './VoiceInput';
+import { exportChatToMarkdown } from '../utils/exportChat';
 
 export default function ChatInterface({ onSend }: { onSend: (msg: string) => Promise<string> }) {
   const [messages, setMessages] = useState<{role: 'user'|'assistant', content: string}[]>([]);
@@ -24,8 +26,23 @@ export default function ChatInterface({ onSend }: { onSend: (msg: string) => Pro
     }
   };
 
+  const handleExport = () => {
+    const formatted = messages.map(m => ({ sender: m.role, text: m.content }));
+    exportChatToMarkdown(formatted, 'pdf-chat-export');
+  };
+
   return (
     <div className={styles.chatContainer}>
+      {messages.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0.5rem 1rem 0' }}>
+          <button 
+            onClick={handleExport}
+            style={{ background: 'none', border: 'none', color: '#00bcd4', cursor: 'pointer', fontSize: '0.8rem' }}
+          >
+            📥 Export Chat
+          </button>
+        </div>
+      )}
       <div className={styles.messages}>
         {messages.map((m, i) => (
           <div key={i} className={m.role === 'user' ? styles.userMsg : styles.assistantMsg}>
@@ -35,10 +52,11 @@ export default function ChatInterface({ onSend }: { onSend: (msg: string) => Pro
         {loading && <div className={styles.loadingContainer}><LoadingSpinner /></div>}
       </div>
       <div className={styles.inputArea}>
+        <VoiceInput onTranscript={text => setInput(prev => (prev ? `${prev} ${text}` : text))} />
         <input 
           value={input} 
           onChange={e => setInput(e.target.value)} 
-          placeholder="Ask a follow-up question..." 
+          placeholder="Ask a question about your PDF..." 
           onKeyDown={e => e.key === 'Enter' && handleSend()}
           className={styles.input}
         />
