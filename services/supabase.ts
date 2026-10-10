@@ -12,12 +12,34 @@ export async function uploadPdfToStorage(file: File, userId: string) {
   return data;
 }
 
+export async function insertDocumentMetadata(userId: string, filePath: string, fileName: string) {
+  const { data, error } = await supabase.from('documents').insert({
+    user_id: userId,
+    path: filePath,
+    name: fileName,
+    created_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function getUserDocuments(userId: string) {
   const { data, error } = await supabase
     .from('documents')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function insertChatMessage(userId: string, role: 'user'|'assistant', content: string) {
+  const { data, error } = await supabase.from('chat_messages').insert({
+    user_id: userId,
+    role,
+    content,
+    created_at: new Date().toISOString(),
+  });
   if (error) throw error;
   return data;
 }

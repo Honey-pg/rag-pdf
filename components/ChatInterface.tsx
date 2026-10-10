@@ -4,6 +4,8 @@ import LoadingSpinner from './LoadingSpinner';
 import MarkdownRenderer from './MarkdownRenderer';
 import VoiceInput from './VoiceInput';
 import { exportChatToMarkdown } from '../utils/exportChat';
+import { useUser } from '@clerk/nextjs';
+import { insertChatMessage } from '../services/supabase';
 
 export default function ChatInterface({ onSend }: { onSend: (msg: string) => Promise<string> }) {
   const [messages, setMessages] = useState<{role: 'user'|'assistant', content: string}[]>([]);
@@ -17,10 +19,16 @@ export default function ChatInterface({ onSend }: { onSend: (msg: string) => Pro
     setInput('');
     setLoading(true);
     try {
+      // Persist user message
+      if (user?.id) await insertChatMessage(user.id, 'user', userMsg);
       const resp = await onSend(userMsg);
       setMessages(prev => [...prev, { role: 'assistant', content: resp }]);
+      // Persist assistant response
+      if (user?.id) await insertChatMessage(user.id, 'assistant', resp);
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error: ' + (e as Error).message }]);
+      const errMsg = 'Error: ' + (e as Error).message;
+      setMessages(prev => [...prev, { role: 'assistant', content: errMsg }]);
+      if (user?.id) await insertChatMessage(user.id, 'assistant', errMsg);
     } finally {
       setLoading(false);
     }
