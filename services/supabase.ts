@@ -33,6 +33,25 @@ export async function getUserDocuments(userId: string) {
   return data;
 }
 
+export async function getChatMessages(userId: string) {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteChatMessages(userId: string) {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .delete()
+    .eq('user_id', userId);
+  if (error) throw error;
+  return data;
+}
+
 export async function insertChatMessage(userId: string, role: 'user'|'assistant', content: string) {
   const { data, error } = await supabase.from('chat_messages').insert({
     user_id: userId,
