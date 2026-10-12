@@ -34,5 +34,7 @@
 }
 
 .nav a:hover {
-  color: #00bcd4;
+  color: #ff4081;
+  text-decoration: underline;
+  transition: color 0.2s ease-in-out;
 }
